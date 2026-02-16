@@ -22,17 +22,18 @@
     position: relative;
   }
 
-  /* 🔥 关键：图片全屏铺满，确保全部显示 */
+  /* 🔥 关键：图片全屏铺满 */
   .page img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* 改为 contain，确保图片完整显示，不被裁剪 */
+    object-fit: contain; /* 不变形、全屏覆盖 */
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
-    background: #000; /* 背景黑色，避免留白突兀 */
-  }
+  }    
+    background: #000;
+
 
   .page.active {
     display: block;
@@ -78,7 +79,7 @@
 <canvas id="fireworks"></canvas>
 
 <div class="page active">
-  <img src="https://s41.ax1x.com/2026/02/16/pZOShkD.jpg">
+  <img src="https://s41.ax1x.com/2026/02/16/pZOShkD.jpg>
 </div>
 <div class="page">
   <img src="https://s41.ax1x.com/2026/02/16/pZOSopd.jpg">
@@ -103,8 +104,7 @@
   const nextBtn = document.getElementById('nextBtn');
   let current = 0;
 
-  // 禁用音频，避免加载失败
-  const fireworkSound = { play: () => {} };
+  const fireworkSound = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-firework-explosion-with-bokeh-1209.mp3");
 
   nextBtn.addEventListener('click', () => {
     pages[current].classList.remove('active');
@@ -112,7 +112,7 @@
     pages[current].classList.add('active');
 
     fireworkSound.currentTime = 0;
-    fireworkSound.play().catch(() => {});
+    fireworkSound.play();
     launchFireworks();
   });
 
