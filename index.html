@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>马年春节六页翻页·全屏图片版</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    overflow: hidden;
+  }
+
+  /* 每页全屏容器 */
+  .page {
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    position: relative;
+  }
+
+  /* 🔥 关键：图片全屏铺满，确保全部显示 */
+  .page img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 改为 contain，确保图片完整显示，不被裁剪 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background: #000; /* 背景黑色，避免留白突兀 */
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  /* 福字按钮 */
+  #nextBtn {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    font-size: 24px;
+    background: linear-gradient(180deg, #FFD700, #FF9900);
+    color: #990000;
+    border: 3px solid #D40000;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255,0,0,0.4);
+    font-weight: bold;
+    z-index: 999;
+    transition: 0.2s;
+  }
+
+  #nextBtn:hover {
+    transform: scale(1.08);
+  }
+
+  /* 烟花画布 */
+  #fireworks {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 998;
+  }
+</style>
+</head>
+
+<body>
+<canvas id="fireworks"></canvas>
+
+<div class="page active">
+  <img src="https://s41.ax1x.com/2026/02/16/pZOShkD.jpg">
+</div>
+<div class="page">
+  <img src="https://s41.ax1x.com/2026/02/16/pZOSopd.jpg">
+</div>
+<div class="page">
+  <img src="https://s41.ax1x.com/2026/02/16/pZOpp1s.jpg">
+</div>
+<div class="page">
+  <img src="https://s41.ax1x.com/2026/02/16/pZOpn39.jpg">
+</div>
+<div class="page">
+  <img src="https://s41.ax1x.com/2025/12/31/pZNl4DU.jpg">
+</div>
+<div class="page">
+  <img src="https://s41.ax1x.com/2026/02/16/pZOpGND.jpg">
+</div>
+
+<button id="nextBtn">福</button>
+
+<script>
+  const pages = document.querySelectorAll('.page');
+  const nextBtn = document.getElementById('nextBtn');
+  let current = 0;
+
+  // 禁用音频，避免加载失败
+  const fireworkSound = { play: () => {} };
+
+  nextBtn.addEventListener('click', () => {
+    pages[current].classList.remove('active');
+    current = (current + 1) % 6;
+    pages[current].classList.add('active');
+
+    fireworkSound.currentTime = 0;
+    fireworkSound.play().catch(() => {});
+    launchFireworks();
+  });
+
+  const canvas = document.getElementById('fireworks');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particles = [];
+
+  class Particle {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.speed = Math.random() * 4 + 2;
+      this.angle = Math.random() * Math.PI * 2;
+      this.gravity = 0.05;
+      this.vx = Math.cos(this.angle) * this.speed;
+      this.vy = Math.sin(this.angle) * this.speed;
+      this.alpha = 1;
+      this.decay = 0.02;
+      this.color = color;
+    }
+    update() {
+      this.vy += this.gravity;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.alpha -= this.decay;
+    }
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function launchFireworks() {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height * 0.6;
+    const colors = ['#FFD700', '#FF0000', '#FF6B00', '#FF006B', '#FFFF00'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    for (let i = 0; i < 80; i++) {
+      particles.push(new Particle(x, y, color));
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.update();
+      p.draw();
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+</body>
+</html>
